@@ -1,0 +1,1 @@
+This is the README file for my final project in my CORE 101 class for Fall 2025 semester at Woodbury University.
