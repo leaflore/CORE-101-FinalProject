@@ -173,6 +173,62 @@ function insertMapSVG(containerId = 'svg-container') {
     return container.querySelector('svg')
   }
   return null
+
+  // -- Overlay drawing helpers --
+  // Ensure the SVG is present in the given container and return the <svg> element.
+  function ensureInsertedSVG(containerId = 'svg-container') {
+    let svgEl = document.querySelector(`#${containerId} svg`)
+    if (!svgEl) svgEl = insertMapSVG(containerId)
+    return svgEl
+  }
+
+  // Get or create an overlay group appended as the last child of the SVG (so it renders on top)
+  function getOverlayGroup(svgEl, overlayId = 'map-overlay') {
+    let g = svgEl.querySelector(`#${overlayId}`)
+    if (!g) {
+      g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+      g.setAttribute('id', overlayId)
+      svgEl.appendChild(g)
+    }
+    return g
+  }
+
+  // Add a line to the map overlay. Coordinates use the SVG viewBox units (0..1366, 0..768).
+  function addLineToMap(x1, y1, x2, y2, opts = {}) {
+    const svgEl = ensureInsertedSVG(opts.containerId || 'svg-container')
+    const overlay = getOverlayGroup(svgEl, opts.overlayId || 'map-overlay')
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+    line.setAttribute('x1', String(x1))
+    line.setAttribute('y1', String(y1))
+    line.setAttribute('x2', String(x2))
+    line.setAttribute('y2', String(y2))
+    line.setAttribute('stroke', opts.stroke || 'red')
+    line.setAttribute('stroke-width', String(opts.strokeWidth || 2))
+    if (opts.strokeDasharray) line.setAttribute('stroke-dasharray', opts.strokeDasharray)
+    if (opts.className) line.setAttribute('class', opts.className)
+    overlay.appendChild(line)
+    return line
+  }
+
+  // Add a small circle (point) to the overlay
+  function addPointToMap(x, y, opts = {}) {
+    const svgEl = ensureInsertedSVG(opts.containerId || 'svg-container')
+    const overlay = getOverlayGroup(svgEl, opts.overlayId || 'map-overlay')
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+    c.setAttribute('cx', String(x))
+    c.setAttribute('cy', String(y))
+    c.setAttribute('r', String(opts.r || 4))
+    c.setAttribute('fill', opts.fill || (opts.color || 'blue'))
+    if (opts.className) c.setAttribute('class', opts.className)
+    overlay.appendChild(c)
+    return c
+  }
+
+  // Expose helpers on window for easy use from other scripts
+  window.ensureInsertedSVG = ensureInsertedSVG
+  window.getOverlayGroup = getOverlayGroup
+  window.addLineToMap = addLineToMap
+  window.addPointToMap = addPointToMap
 }
 
 // Auto-insert on page load if container exists

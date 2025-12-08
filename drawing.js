@@ -11,20 +11,20 @@ function draw() {
     ellipse(0, 0, r, r)
 }*/
 
-let img
+//let img
 
 //My exercise to write notes of syntax to eventually memoorize it.
 //Load the image and create :) a p5.Image object.
-function preload() {
+/*function preload() {
     img = loadImage('assets/20251208_SitePlanMain.svg')
-}
+}*/
 
 function setup() {
     createCanvas(1366, 768, SVG)
     background(255)
 
     //Draw the image
-    image(img, 0,0)
+    /*image(img, 0,0)*/
 
     describe('Image of the underside of a white umbrella and a gridded ceiling.')
 }
