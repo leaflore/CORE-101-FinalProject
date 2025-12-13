@@ -173,71 +173,143 @@ function insertMapSVG(containerId = 'svg-container') {
     return container.querySelector('svg')
   }
   return null
-
-  // -- Overlay drawing helpers --
-  // Ensure the SVG is present in the given container and return the <svg> element.
-  function ensureInsertedSVG(containerId = 'svg-container') {
-    let svgEl = document.querySelector(`#${containerId} svg`)
-    if (!svgEl) svgEl = insertMapSVG(containerId)
-    return svgEl
-  }
-
-  // Get or create an overlay group appended as the last child of the SVG (so it renders on top)
-  function getOverlayGroup(svgEl, overlayId = 'map-overlay') {
-    let g = svgEl.querySelector(`#${overlayId}`)
-    if (!g) {
-      g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-      g.setAttribute('id', overlayId)
-      svgEl.appendChild(g)
-    }
-    return g
-  }
-
-  // Add a line to the map overlay. Coordinates use the SVG viewBox units (0..1366, 0..768).
-  function addLineToMap(x1, y1, x2, y2, opts = {}) {
-    const svgEl = ensureInsertedSVG(opts.containerId || 'svg-container')
-    const overlay = getOverlayGroup(svgEl, opts.overlayId || 'map-overlay')
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
-    line.setAttribute('x1', String(x1))
-    line.setAttribute('y1', String(y1))
-    line.setAttribute('x2', String(x2))
-    line.setAttribute('y2', String(y2))
-    line.setAttribute('stroke', opts.stroke || 'red')
-    line.setAttribute('stroke-width', String(opts.strokeWidth || 2))
-    if (opts.strokeDasharray) line.setAttribute('stroke-dasharray', opts.strokeDasharray)
-    if (opts.className) line.setAttribute('class', opts.className)
-    overlay.appendChild(line)
-    return line
-  }
-
-  // Add a small circle (point) to the overlay
-  function addPointToMap(x, y, opts = {}) {
-    const svgEl = ensureInsertedSVG(opts.containerId || 'svg-container')
-    const overlay = getOverlayGroup(svgEl, opts.overlayId || 'map-overlay')
-    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-    c.setAttribute('cx', String(x))
-    c.setAttribute('cy', String(y))
-    c.setAttribute('r', String(opts.r || 4))
-    c.setAttribute('fill', opts.fill || (opts.color || 'blue'))
-    if (opts.className) c.setAttribute('class', opts.className)
-    overlay.appendChild(c)
-    return c
-  }
-
-  // Expose helpers on window for easy use from other scripts
-  window.ensureInsertedSVG = ensureInsertedSVG
-  window.getOverlayGroup = getOverlayGroup
-  window.addLineToMap = addLineToMap
-  window.addPointToMap = addPointToMap
 }
 
-// Auto-insert on page load if container exists
+// -- Overlay drawing helpers --
+// Ensure the SVG is present in the given container and return the <svg> element.
+function ensureInsertedSVG(containerId = 'svg-container') {
+  let svgEl = document.querySelector(`#${containerId} svg`)
+  if (!svgEl) svgEl = insertMapSVG(containerId)
+  return svgEl
+}
+
+// Get or create an overlay group appended as the last child of the SVG (so it renders on top)
+function getOverlayGroup(svgEl, overlayId = 'map-overlay') {
+  let g = svgEl.querySelector(`#${overlayId}`)
+  if (!g) {
+    g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+    g.setAttribute('id', overlayId)
+    svgEl.appendChild(g)
+  }
+  return g
+}
+
+// Add a line to the map overlay. Coordinates use the SVG viewBox units (0..1366, 0..768).
+function addLineToMap(x1, y1, x2, y2, opts = {}) {
+  const svgEl = ensureInsertedSVG(opts.containerId || 'svg-container')
+  const overlay = getOverlayGroup(svgEl, opts.overlayId || 'map-overlay')
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+  line.setAttribute('x1', String(x1))
+  line.setAttribute('y1', String(y1))
+  line.setAttribute('x2', String(x2))
+  line.setAttribute('y2', String(y2))
+  line.setAttribute('stroke', opts.stroke || 'red')
+  line.setAttribute('stroke-width', String(opts.strokeWidth || 2))
+  if (opts.strokeDasharray) line.setAttribute('stroke-dasharray', opts.strokeDasharray)
+  if (opts.className) line.setAttribute('class', opts.className)
+  overlay.appendChild(line)
+  return line
+}
+
+// Add a small circle (point) to the overlay
+function addPointToMap(x, y, opts = {}) {
+  const svgEl = ensureInsertedSVG(opts.containerId || 'svg-container')
+  const overlay = getOverlayGroup(svgEl, opts.overlayId || 'map-overlay')
+  const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+  c.setAttribute('cx', String(x))
+  c.setAttribute('cy', String(y))
+  c.setAttribute('r', String(opts.r || 4))
+  c.setAttribute('fill', opts.fill || (opts.color || 'blue'))
+  if (opts.className) c.setAttribute('class', opts.className)
+  overlay.appendChild(c)
+  return c
+}
+
+// Ensure a div exists inside the svg container for p5's canvas to parent into.
+function ensureCanvasContainer(svgContainerId = 'svg-container', canvasContainerId = 'canvas-container') {
+  const container = document.getElementById(svgContainerId)
+  if (!container) return null
+  // Make sure the parent is positioned so absolute children align properly
+  const cs = window.getComputedStyle(container)
+  if (cs.position === 'static' || !cs.position) {
+    container.style.position = 'relative'
+  }
+
+  let canvasContainer = document.getElementById(canvasContainerId)
+  if (!canvasContainer) {
+    canvasContainer = document.createElement('div')
+    canvasContainer.id = canvasContainerId
+    // position and size to overlay the svg
+    canvasContainer.style.position = 'absolute'
+    canvasContainer.style.top = '0'
+    canvasContainer.style.left = '0'
+    canvasContainer.style.width = '100%'
+    canvasContainer.style.height = '100%'
+    canvasContainer.style.pointerEvents = 'auto'
+    container.appendChild(canvasContainer)
+  }
+  // After creating container, ensure the p5 canvas matches the SVG viewport
+  function getSVGViewportSize() {
+    const svgEl = document.querySelector(`#${svgContainerId} svg`)
+    if (!svgEl) return null
+    const vb = svgEl.getAttribute('viewBox')
+    if (vb) {
+      const parts = vb.split(/\s+/).map(Number)
+      if (parts.length === 4 && parts.every(n => !Number.isNaN(n))) {
+        return { width: parts[2], height: parts[3] }
+      }
+    }
+    // fallback to client size
+    return { width: Math.max(1, Math.round(svgEl.clientWidth)), height: Math.max(1, Math.round(svgEl.clientHeight)) }
+  }
+
+  // Dispatch a custom event so p5 can resize its canvas via resizeCanvas(w,h)
+  function dispatchP5Resize() {
+    const size = getSVGViewportSize()
+    if (!size) return
+    // Also set the raw canvas element attributes (in case p5 isn't listening)
+    const canvasEl = document.querySelector(`#${canvasContainerId} canvas`)
+    if (canvasEl) {
+      canvasEl.width = size.width
+      canvasEl.height = size.height
+      canvasEl.style.width = '100%'
+      canvasEl.style.height = '100%'
+    }
+    const ev = new CustomEvent('p5resize', { detail: { width: size.width, height: size.height } })
+    window.dispatchEvent(ev)
+  }
+
+  // Debounced resize handler
+  let _resizeTimer = null
+  function scheduleResize() {
+    if (_resizeTimer) clearTimeout(_resizeTimer)
+    _resizeTimer = setTimeout(() => {
+      dispatchP5Resize()
+      _resizeTimer = null
+    }, 100)
+  }
+
+  // Initial dispatch to set size if canvas already exists
+  dispatchP5Resize()
+  // Listen for window resizes and also for SVG changes (resize event)
+  window.addEventListener('resize', scheduleResize)
+
+  return canvasContainer
+}
+
+// Expose helpers on window for easy use from other scripts
+window.insertMapSVG = insertMapSVG
+window.ensureInsertedSVG = ensureInsertedSVG
+window.getOverlayGroup = getOverlayGroup
+window.addLineToMap = addLineToMap
+window.addPointToMap = addPointToMap
+window.ensureCanvasContainer = ensureCanvasContainer
+
+// Auto-insert on page load and ensure canvas container exists for p5
 document.addEventListener('DOMContentLoaded', () => {
   insertMapSVG('svg-container')
+  ensureCanvasContainer('svg-container', 'canvas-container')
 })
-
-// Also expose the function on window for manual calls
-window.insertMapSVG = insertMapSVG
 
 // Optional: automatically insert on DOMContentLoaded if a container with id 'map-auto' exists
 /*document.addEventListener('DOMContentLoaded', () => {
