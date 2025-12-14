@@ -51,13 +51,13 @@ function preload(){
 }
 
 
-class Dot {
+/*class Dot {
 
     constructor(x, y) {
         this.start = createVection(x, y)
         let sourceNum = round(rand)
     }
-}
+}*/
 
 
 //File Classes used in the project
@@ -114,6 +114,7 @@ function setup() {
 
     }
 
+    console.log(pLineCoords[0])
     //Separates the x and y coordinates from the CSV file row
     
 }
@@ -141,7 +142,8 @@ function _applyPendingP5Resize() {
     }
 }
 
-
+remapV = new Remap()
+ 
 
 //Main draw function
 function draw(){
@@ -150,19 +152,27 @@ function draw(){
     stroke(255, 0, 0)
     strokeWeight(4)
     line(mouseX, mouseY, width/2, height/2)
-    remapV = new Remap()
+    //remapV = new Remap()
     noFill()
     ellipse(width/2, height/2, 100, 100)
 
     //Draws the points on the map
     for( var i = 0; i < dataTableLength; i++){
         ellipse(remapV.remapX(xCenter[i]), remapV.remapY(yCenter[i]), 10, 10)
+
         // Create nestesd arrays for the coordinate lines
         // The loop will include maybe some sequential part in the loop that is offfset
+
+        //Make pLCoordGroups a list for rach array goups
+        /*plCoordGroups = Math.round(pLineCoords[i].length / 4)
+
+        for( var j = 0; j < plCoordGroups; i){
+            line(pLineCoords[i][j], pLineCoords[i][j+1], pLineCoords[i][j+2], pLineCoords[i][j+3])
+        }*/
     }
     
-    line(pLineCoords[0][0], pLineCoords[0][1], pLineCoords[0][2], pLineCoords[0][3])
-    //console.log(pLineCoords[0])
+    
+   
 
     //ellipse(remapV.remapX(674.56), remapV.remapY(327.36), 10, 10)
     //console.log(remapV.remapX(0))
