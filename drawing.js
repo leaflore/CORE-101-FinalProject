@@ -35,6 +35,7 @@ var xCenter = []
 var yCenter = []
 var pCoords = []
 var pLineCoords = []
+var plCoordGroups = []
 var remapV
 
 var dotPair
@@ -111,11 +112,16 @@ function setup() {
         pCoords[i] = dataTable.getString(i, 4)
 
         pLineCoords[i] = split(pCoords[i], ',')
+        plCoordGroups[i] = Math.round((pLineCoords[i].length) / 4)
 
     }
 
     console.log(pLineCoords[0])
+    console.log(plCoordGroups[0])
     //Separates the x and y coordinates from the CSV file row
+
+    
+    
     
 }
 
@@ -164,12 +170,14 @@ function draw(){
         // The loop will include maybe some sequential part in the loop that is offfset
 
         //Make pLCoordGroups a list for rach array goups
-        /*plCoordGroups = Math.round(pLineCoords[i].length / 4)
+        
 
-        for( var j = 0; j < plCoordGroups; i){
+        /*for( var j = 0; j < plCoordGroups; i){
             line(pLineCoords[i][j], pLineCoords[i][j+1], pLineCoords[i][j+2], pLineCoords[i][j+3])
         }*/
     }
+
+
     
     
    
