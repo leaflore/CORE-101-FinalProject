@@ -38,12 +38,14 @@ var plCoordsList = []
 var plcGroupLength = []
 var remapV
 
-var dotPair
-var dotArray = []
+var routePair
+var routeArray = []
+var allSegments = []
+var segmentIndex = 0
 var tempX
 var tempY
 var speed = 2.5
-var raady = false
+var ready = false
 
 
 //Load image and dataset
@@ -52,14 +54,35 @@ function preload(){
 }
 
 
-/*class Dot {
+class Route {
 
-    constructor(x, y) {
-        this.start = createVection(x, y)
-        let sourceNum = round(rand)
+    constructor(coordX1, coordY1, coordX2, coordY2) {
+        this.start = createVector(coordX1, coordY1)
+        this.end =  createVector(coordX2, coordY2)
+        this.current = this.start.copy()
+        // Below is ther percentage of the line completed
+        this.angle = 0.0
+        this.isDone = false
     }
-}*/
 
+    showLine() {
+        line(this.start.x, this.start.y, this.current.x, this.current.y)
+    }
+
+    animateLine() {
+        var tempX = map(this.angle, 0, 100, this.start.x, this.end.x, true)
+        var tempY = map(this.angle, 0, 100, this.start.y, this.end.y, true)
+
+        this.current.set(tempX, tempY)
+
+        if (this.angle >= 100) {
+            this.isDone = true
+        }
+        else {
+            this.angle += speed
+        }
+    }
+}
 
 //File Classes used in the project
 
@@ -120,22 +143,24 @@ function setup() {
         for(var j = 0; j < plCoordsList[i].length; j++){
             plCoordsList[i][j] = Number(plCoordsList[i][j])
         }
+
     }
-    
-    console.log(plCoordsList[0])
-    console.log(plcGroupLength[0])
-    console.log(plCoordsList[0][0])
 
-    qple = 0 * 4
+    for(var i = 0; i < dataTableLength; i++){
 
-    x1 = remapV.remapX(plCoordsList[0][2])
-    y1 = remapV.remapY(plCoordsList[0][3])
-    x2 = remapV.remapX(plCoordsList[0][4])
-    y2 = remapV.remapY(plCoordsList[0][5])
-    
-    console.log(y1)
+        // Build segments from coordinate pairs: [x1,y1,x2,y2, x3,y3,x4,y4, ...]
+        // Each segment connects two points, so we step by 2 to get consecutive pairs
+        for(var j = 0; j + 3 < plCoordsList[i].length; j += 2){
+            
+            var x1 = remapV.remapX(plCoordsList[i][j])
+            var y1 = remapV.remapY(plCoordsList[i][j+1])
 
-   
+            var x2 = remapV.remapX(plCoordsList[i][j+2])
+            var y2 = remapV.remapY(plCoordsList[i][j+3])
+
+            append(allSegments, new Route(x1, y1, x2, y2))
+        }
+    }    
 }
 
 
@@ -182,26 +207,26 @@ function draw(){
         // Create nestesd arrays for the coordinate lines
         // The loop will include maybe some sequential part in the loop that is offfset
 
-        //Make pLCoordGroups a list for rach array goups
+        //Make pLCoordGroups a list for rach array goup
+    }
 
-        for( var j = 0; j <= plcGroupLength[i]; j++){
-            
-            qple = (2*j)
+    stroke(0, 0, 255)
+    strokeWeight(2)
 
-            x1 = remapV.remapX(plCoordsList[i][qple])
-            y1 = remapV.remapY(plCoordsList[i][qple+1])
-            x2 = remapV.remapX(plCoordsList[i][qple+2])
-            y2 = remapV.remapY(plCoordsList[i][qple+3])
+    for( var i = 0; i < segmentIndex; i++){
+        var segment = allSegments[i]
+        line(segment.start.x, segment.start.y, segment.end.x, segment.end.y)
+    }
 
-            line(x1, y1, x2, y2)
+    if (segmentIndex < allSegments.length) {
+        var currentSegment = allSegments[segmentIndex]
 
+        currentSegment.animateLine()
+        currentSegment.showLine()
 
-            /*console.log(x1)
-            console.log(y1)
-            console.log(x2)
-            console.log(y2)*/
+        if (currentSegment.isDone) {
+            segmentIndex++
         }
-       
     }
     //line(x1, y1, x2, y2)
     //ellipse(remapV.remapX(674.56), remapV.remapY(327.36), 10, 10)
