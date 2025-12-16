@@ -47,6 +47,10 @@ var tempY
 var speed = 2.5
 var ready = false
 
+var apartmentCenters = []
+var aoCenterX = []
+var aoCenterY = []
+
 
 //Load image and dataset
 function preload(){
@@ -84,9 +88,34 @@ class Route {
     }
 }
 
+class apartmentOrigin {
+    
+    constructor(hoverX, hoverY, index){
+        this.x = hoverX
+        this.y = hoverY
+        this.index = index
+        this.sz = 10  // Size of the circle for hover detection
+        this.hu = 200  // Hue value for the rectangle color
+    }
+    
+    mouseHovered(){
+        if(dist(mouseX, mouseY, this.x, this.y) <= this.sz/2){
+            this.showInfo()  // Call as a method of this object
+        }
+    }
+
+    showInfo(){
+        fill(this.hu, 70, 70, 20)
+        rect(this.x, this.y, 200, 200)
+
+        fill(0)
+        textSize(20)
+        text(this.index, this.x - 15, this.y +15)
+    }
+  
+}
+
 //File Classes used in the project
-
-
 function Remap(){
     this.funcX1 = 0
     this.funcY1 = 0
@@ -144,6 +173,8 @@ function setup() {
             plCoordsList[i][j] = Number(plCoordsList[i][j])
         }
 
+        apartmentCenters[i] = new apartmentOrigin(remapV.remapX(xCenter[i]), remapV.remapY(yCenter[i]), [i])
+
     }
 
     for(var i = 0; i < dataTableLength; i++){
@@ -160,7 +191,9 @@ function setup() {
 
             append(allSegments, new Route(x1, y1, x2, y2))
         }
-    }    
+    }
+    
+    
 }
 
 
@@ -202,13 +235,14 @@ function draw(){
 
     //Draws the points on the map
     for( var i = 0; i < dataTableLength; i++){
+        noFill()  // Ensure circles are not filled
+        stroke(255, 0, 0)  // Reset stroke color for circles
+        strokeWeight(4)
         ellipse(remapV.remapX(xCenter[i]), remapV.remapY(yCenter[i]), 10, 10)
-
-        // Create nestesd arrays for the coordinate lines
-        // The loop will include maybe some sequential part in the loop that is offfset
-
-        //Make pLCoordGroups a list for rach array goup
+        apartmentCenters[i].mouseHovered()
+        
     }
+
 
     stroke(0, 0, 255)
     strokeWeight(2)
