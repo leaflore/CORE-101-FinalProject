@@ -1,24 +1,3 @@
-/*function setup() {
-    createCanvas(100,  100, SVG)
-    background(255)
-    fill(150)
-    stroke(150)
-}
-
-function draw() {
-    var r = frameCount % 200 * Math.sqrt(2)
-    background(255)
-    ellipse(0, 0, r, r)
-}*/
-
-//let img
-
-//My exercise to write notes of syntax to eventually memoorize it.
-//Load the image and create :) a p5.Image object.
-/*function preload() {
-    img = loadImage('assets/20251208_SitePlanMain.svg')
-}*/
-
 //Define file variables
 var x1
 var y1
@@ -88,6 +67,7 @@ class Route {
     }
 }
 
+
 class apartmentOrigin {
     
     constructor(hoverX, hoverY, index){
@@ -106,7 +86,7 @@ class apartmentOrigin {
 
     showInfo(){
         fill(this.hu, 70, 70, 20)
-        rect(this.x, this.y, 200, 200)
+        rect(this.x, this.y, 200, 100)
 
         fill(0)
         textSize(20)
